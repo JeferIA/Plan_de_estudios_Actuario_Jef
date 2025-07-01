@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Seguimiento Académico - Ciencias Actuariales</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .control-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .progress-stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-width: 120px;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .aprobadas { color: #28a745; }
+        .disponibles { color: #007bff; }
+        .bloqueadas { color: #dc3545; }
+        .cursando { color: #ffc107; }
+        .total { color: #6f42c1; }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 3px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            border-radius: 20px;
+            background: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: 2px solid #dee2e6;
+        }
+
+        .main-content {
+            padding: 30px;
+        }
+
+        .flowchart {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .level {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .level-title {
+            text-align: center;
+            font-weight: bold;
+            color: white;
+            font-size: 1.2em;
+            padding: 15px;
+            background: linear-gradient(45deg, #f39c12, #e67e22);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+        }
+
+        .subject {
+            border-radius: 12px;
+            padding: 18px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 3px solid #dee2e6;
+            position: relative;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .subject:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .subject-code {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+
+        .subject-status {
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .subject-status:hover {
+            transform: scale(1.2);
+        }
+
+        .subject-name {
+            font-size: 1em;
+            line-height: 1.3;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .subject-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 10px;
+        }
+
+        .subject-hours {
+            font-weight: 500;
+            background: rgba(0,0,0,0.1);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+
+        .prereq-info {
+            font-size: 0.8em;
+            color: #6c757d;
+            font-style: italic;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px dashed #ddd;
+        }
+
+        .category-tag {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        /* Categorías de materias */
+        .matematica { background-color: rgba(52, 152, 219, 0.15); color: #2980b9; }
+        .estadistica { background-color: rgba(155, 89, 182, 0.15); color: #8e44ad; }
+        .economia { background-color: rgba(46, 204, 113, 0.15); color: #27ae60; }
+        .actuarial { background-color: rgba(231, 76, 60, 0.15); color: #c0392b; }
+        .derecho { background-color: rgba(241, 196, 15, 0.15); color: #d35400; }
+        .otros { background-color: rgba(149, 165, 166, 0.15); color: #7f8c8d; }
+
+        /* Estados de las materias */
+        .subject.aprobada {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        }
+
+        .subject.disponible {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #cce5ff, #b3d9ff);
+            animation: pulse-disponible 2s infinite;
+        }
+
+        .subject.bloqueada {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da, #f1aeb5);
+            opacity: 0.7;
+        }
+
+        .subject.cursando {
+            border-color: #ffc107;
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border-style: dashed;
+        }
+
+        @keyframes pulse-disponible {
+            0% { box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+            50% { box-shadow: 0 4px 20px rgba(0,123,255,0.3); }
+            100% { box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 5;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .prereq-list {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+
+        .prereq-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .prereq-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .recommendations {
+            background: #e8f4f8;
+            border-left: 4px solid #17a2b8;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .recommendation-title {
+            font-weight: bold;
+            color: #0c5460;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .recommendation-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .recommendation-list li {
+            padding: 8px 0;
+            padding-left: 30px;
+            position: relative;
+            border-bottom: 1px solid #d1ecf1;
+        }
+
+        .recommendation-list li:last-child {
+            border-bottom: none;
+        }
+
+        .recommendation-list li::before {
+            content: "💡";
+            position: absolute;
+            left: 10px;
+            top: 8px;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            margin: 15px 0;
+            height: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #007bff, #ffc107);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-weight: bold;
+            margin-top: 5px;
+            color: #495057;
+        }
+
+        @media (max-width: 768px) {
+            .control-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .progress-stats {
+                justify-content: center;
+            }
+            
+            .flowchart {
+                grid-template-columns: 1fr;
+            }
+            
+            .subject {
+                padding: 15px;
+            }
+            
+            .action-buttons {
+                justify-content: center;
+            }
+            
+            .btn {
+                flex: 1;
+                text-align: center;
+                justify-content: center;
+            }
+            
+            .modal-content {
+                width: 95%;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title"><i class="fas fa-graduation-cap"></i> Sistema de Seguimiento Académico</h1>
+            <p class="subtitle">Licenciatura en Ciencias Actuariales</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-section">
+                <div class="progress-stats">
+                    <div class="stat-card">
+                        <div class="stat-number aprobadas" id="stat-aprobadas">0</div>
+                        <div class="stat-label">Aprobadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number disponibles" id="stat-disponibles">6</div>
+                        <div class="stat-label">Disponibles</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number cursando" id="stat-cursando">0</div>
+                        <div class="stat-label">Cursando</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number bloqueadas" id="stat-bloqueadas">18</div>
+                        <div class="stat-label">Bloqueadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number total" id="stat-total">24</div>
+                        <div class="stat-label">Total</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="showRecommendations()">
+                        <i class="fas fa-lightbulb"></i> Recomendaciones
+                    </button>
+                    <button class="btn btn-success" onclick="exportProgress()">
+                        <i class="fas fa-save"></i> Guardar Progreso
+                    </button>
+                    <button class="btn btn-warning" onclick="importProgress()">
+                        <i class="fas fa-folder-open"></i> Cargar Progreso
+                    </button>
+                    <button class="btn btn-danger" onclick="resetProgress()">
+                        <i class="fas fa-redo"></i> Reiniciar
+                    </button>
+                </div>
+            </div>
+            
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+            </div>
+            <div class="progress-text" id="progress-text">Progreso: 0%</div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #28a745;"></div>
+                <span>✅ Aprobada</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #007bff;"></div>
+                <span>📚 Disponible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffc107;"></div>
+                <span>📖 Cursando</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #dc3545;"></div>
+                <span>🚫 Bloqueada</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #3498db;"></div>
+                <span>📊 Matemáticas</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9b59b6;"></div>
+                <span>📈 Estadística</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #2ecc71;"></div>
+                <span>💰 Economía</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #e74c3c;"></div>
+                <span>📝 Actuarial</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="flowchart" id="flowchart">
+                <!-- El contenido se generará dinámicamente -->
+            </div>
+
+            <div class="recommendations" id="recommendations">
+                <div class="recommendation-title">
+                    <i class="fas fa-lightbulb"></i> Recomendaciones Personalizadas
+                </div>
+                <ul class="recommendation-list" id="recommendation-list">
+                    <li>Haz clic en "Recomendaciones" para obtener sugerencias personalizadas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para detalles de materia -->
+    <div id="subjectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modal-title">Detalles de Materia</h2>
+                <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Contenido dinámico -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos actualizados del plan de estudios
+        const subjects = {
+            // Primer Tramo
+            '245': {
+                name: 'Álgebra',
+                hours: '4VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'matematica',
+                critical: true
+            },
+            '241': {
+                name: 'Análisis Matemático I',
+                hours: '6VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'matematica',
+                critical: true
+            },
+            '242': {
+                name: 'Economía',
+                hours: '4VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'economia'
+            },
+            '246': {
+                name: 'Historia económica y social argentina',
+                hours: '4VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'otros'
+            },
+            '255': {
+                name: 'Análisis Contable',
+                hours: '4VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'otros'
+            },
+            '256': {
+                name: 'Instituciones de Gobierno y Economía Política',
+                hours: '4VH',
+                level: 'Primer Tramo',
+                prereq: [],
+                category: 'otros'
+            },
+            
+            // Segundo Tramo
+            '540': {
+                name: 'Análisis Estadístico',
+                hours: '6VH',
+                level: 'Segundo Tramo',
+                prereq: ['245','241','242','246','255','256'],
+                category: 'estadistica',
+                critical: true
+            },
+            '542': {
+                name: 'Matemática Aplicada',
+                hours: '6VH',
+                level: 'Segundo Tramo',
+                prereq: ['245','241','242','246','255','256'],
+                category: 'matematica',
+                critical: true
+            },
+            '262': {
+                name: 'Macroeconomía I',
+                hours: '6VH',
+                level: 'Segundo Tramo',
+                prereq: ['245','241','242','246','255','256'],
+                category: 'economia'
+            },
+            '274': {
+                name: 'Sistemas Administrativos',
+                hours: '4VH',
+                level: 'Segundo Tramo',
+                prereq: ['245','241','242','246','255','256'],
+                category: 'otros'
+            },
+            '462': {
+                name: 'Derecho Empresarial',
+                hours: '4VH',
+                level: 'Segundo Tramo',
+                prereq: ['245','241','242','246','255','256'],
+                category: 'derecho'
+            },
+            
+            // Ciclo Profesional
+            '602': {
+                name: 'Análisis Estadístico II',
+                hours: '6VH',
+                level: 'Ciclo Profesional',
+                prereq: ['540','542'],
+                category: 'estadistica',
+                critical: true
+            },
+            '601': {
+                name: 'Matemática Financiera y Actuarial',
+                hours: '6VH',
+                level: 'Ciclo Profesional',
+                prereq: ['540','542'],
+                category: 'matematica',
+                critical: true
+            },
+            '544': {
+                name: 'Matemática Aplicada II',
+                hours: '6VH',
+                level: 'Ciclo Profesional',
+                prereq: ['542'],
+                category: 'matematica',
+                critical: true
+            },
+            '752': {
+                name: 'Análisis Numérico',
+                hours: '4VH',
+                level: 'Ciclo Profesional',
+                prereq: ['544'],
+                category: 'estadistica'
+            },
+            '291': {
+                name: 'Microeconomía p/economistas',
+                hours: '6VH',
+                level: 'Ciclo Profesional',
+                prereq: ['542'],
+                category: 'economia'
+            },
+            '279': {
+                name: 'Administración Financiera',
+                hours: '6VH',
+                level: 'Ciclo Profesional',
+                prereq: ['601'],
+                category: 'otros'
+            },
+            '548': {
+                name: 'Dinero y Bancos',
+                hours: '4VH',
+                level: 'Ciclo Profesional',
+                prereq: ['279','602'],
+                category: 'economia'
+            },
+            '603': {
+                name: 'Derecho Financiero,Seguros y Seguridad Social',
+                hours: '4VH',
+                level: 'Ciclo Profesional',
+                prereq: ['462'],
+                category: 'derecho'
+            },
+            '746': {
+                name: 'Computación Científica Actuarial',
+                hours: '4VH',
+                level: 'Ciclo Profesional',
+                prereq: ['540','542'],
+                category: 'actuarial'
+            },
+            
+            // Nivel Avanzado
+            '751': {
+                name: 'Estadística Actuarial',
+                hours: '4VH',
+                level: 'Nivel Avanzado',
+                prereq: ['544','602'],
+                category: 'estadistica',
+                critical: true
+            },
+            '753': {
+                name: 'Biometría Actuarial',
+                hours: '6VH',
+                level: 'Nivel Avanzado',
+                prereq: ['601','751','752'],
+                category: 'actuarial',
+                critical: true
+            },
+            '754': {
+                name: 'Teoría Act. de los Seguros Personales (Act.1)',
+                hours: '4VH',
+                level: 'Nivel Avanzado',
+                prereq: ['753'],
+                category: 'actuarial',
+                critical: true
+            },
+            '755': {
+                name: 'Teoría Act. de los Seguros Patrimoniales (Act.2)',
+                hours: '4VH',
+                level: 'Nivel Avanzado',
+                prereq: ['601','751','752'],
+                category: 'actuarial',
+                critical: true
+            },
+            '757': {
+                name: 'Teoría del Equilibrio Actuarial (Act.3)',
+                hours: '4VH',
+                level: 'Nivel Avanzado',
+                prereq: ['754','755'],
+                category: 'actuarial',
+                critical: true
+            },
+            '756': {
+                name: 'Teoría Actuarial de Fondos de Jubilaciones y Salud (Act.4)',
+                hours: '6VH',
+                level: 'Nivel Avanzado',
+                prereq: ['754'],
+                category: 'actuarial',
+                critical: true
+            },
+            '758': {
+                name: 'Bases Act. de las Inversiones y Financiamiento (Act.5)',
+                hours: '4VH',
+                level: 'Nivel Avanzado',
+                prereq: ['601','751'],
+                category: 'actuarial',
+                critical: true
+            },
+            
+            // Final
+            '717': {
+                name: 'Modelos y Proyecciones Actuariales',
+                hours: '4VH',
+                level: 'Final',
+                prereq: ['757','758','746'],
+                category: 'actuarial',
+                critical: true
+            },
+            '728': {
+                name: 'Práctica Profesional del Actuario',
+                hours: '6VH',
+                level: 'Final',
+                prereq: ['754','755','756'],
+                category: 'actuarial',
+                critical: true
+            }
+        };
+
+        // Estado del estudiante
+        let studentProgress = {
+            aprobadas: new Set(),
+            cursando: new Set()
+        };
+
+        // Inicializar aplicación
+        function init() {
+            loadProgress();
+            renderFlowchart();
+            updateStats();
+            updateRecommendations();
+        }
+
+        // Renderizar diagrama de flujo
+        function renderFlowchart() {
+            const flowchart = document.getElementById('flowchart');
+            const levels = {};
+            
+            // Agrupar materias por nivel
+            Object.entries(subjects).forEach(([code, subject]) => {
+                if (!levels[subject.level]) {
+                    levels[subject.level] = [];
+                }
+                levels[subject.level].push({code, ...subject});
+            });
+
+            flowchart.innerHTML = '';
+            
+            // Ordenar niveles en orden lógico
+            const levelOrder = [
+                'Primer Tramo',
+                'Segundo Tramo',
+                'Ciclo Profesional',
+                'Nivel Avanzado',
+                'Final'
+            ];
+            
+            levelOrder.forEach(levelName => {
+                if (levels[levelName]) {
+                    const levelDiv = document.createElement('div');
+                    levelDiv.className = 'level';
+                    
+                    levelDiv.innerHTML = `
+                        <div class="level-title">${levelName}</div>
+                        ${levels[levelName].map(subject => createSubjectHTML(subject)).join('')}
+                    `;
+                    
+                    flowchart.appendChild(levelDiv);
+                }
+            });
+        }
+
+        // Crear HTML para una materia
+        function createSubjectHTML(subject) {
+            const status = getSubjectStatus(subject.code);
+            const statusIcon = getStatusIcon(status);
+            const categoryClass = subject.category;
+            
+            return `
+                <div class="subject ${status} ${categoryClass}" onclick="openSubjectModal('${subject.code}')">
+                    <div class="subject-header">
+                        <div class="subject-code">${subject.code}</div>
+                        <div class="subject-status" onclick="event.stopPropagation(); toggleSubjectStatus('${subject.code}')">${statusIcon}</div>
+                    </div>
+                    <div class="subject-name">${subject.name}</div>
+                    <div class="category-tag">${getCategoryName(subject.category)}</div>
+                    <div class="subject-info">
+                        <div class="subject-hours">${subject.hours}</div>
+                        ${subject.critical ? '<span style="color: #e67e22;"><i class="fas fa-star"></i> Crítica</span>' : ''}
+                    </div>
+                    ${subject.prereq.length > 0 ? `<div class="prereq-info">Requiere: ${subject.prereq.join(', ')}</div>` : ''}
+                </div>
+            `;
+        }
+
+        // Obtener nombre de categoría
+        function getCategoryName(category) {
+            const names = {
+                'matematica': 'Matemáticas',
+                'estadistica': 'Estadística',
+                'economia': 'Economía',
+                'actuarial': 'Actuarial',
+                'derecho': 'Derecho',
+                'otros': 'Otras'
+            };
+            return names[category] || category;
+        }
+
+        // Obtener estado de una materia
+        function getSubjectStatus(code) {
+            if (studentProgress.aprobadas.has(code)) return 'aprobada';
+            if (studentProgress.cursando.has(code)) return 'cursando';
+            if (canTakeSubject(code)) return 'disponible';
+            return 'bloqueada';
+        }
+
+        // Verificar si puede cursar una materia
+        function canTakeSubject(code) {
+            const subject = subjects[code];
+            return subject.prereq.every(prereq => studentProgress.aprobadas.has(prereq));
+        }
+
+        // Obtener icono según estado
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'aprobada': return '✅';
+                case 'disponible': return '📚';
+                case 'cursando': return '📖';
+                case 'bloqueada': return '🚫';
+                default: return '❓';
+            }
+        }
+
+        // Cambiar estado de materia
+        function toggleSubjectStatus(code) {
+            const currentStatus = getSubjectStatus(code);
+            
+            switch(currentStatus) {
+                case 'disponible':
+                    studentProgress.cursando.add(code);
+                    break;
+                case 'cursando':
+                    studentProgress.cursando.delete(code);
+                    studentProgress.aprobadas.add(code);
+                    break;
+                case 'aprobada':
+                    studentProgress.aprobadas.delete(code);
+                    break;
+            }
+            
+            renderFlowchart();
+            updateStats();
+            updateRecommendations();
+            saveProgress();
+        }
+
+        // Abrir modal de materia
+        function openSubjectModal(code) {
+            const subject = subjects[code];
+            const status = getSubjectStatus(code);
+            
+            document.getElementById('modal-title').textContent = `${code} - ${subject.name}`;
+            
+            let prereqHTML = '';
+            if (subject.prereq.length > 0) {
+                prereqHTML = `
+                    <div class="prereq-list">
+                        <h4><i class="fas fa-link"></i> Correlativas:</h4>
+                        ${subject.prereq.map(prereq => {
+                            const prereqStatus = getSubjectStatus(prereq);
+                            const prereqName = subjects[prereq]?.name || prereq;
+                            return `
+                                <div class="prereq-item">
+                                    <span>${prereq} - ${prereqName}</span>
+                                    <span>${getStatusIcon(prereqStatus)} ${prereqStatus.charAt(0).toUpperCase() + prereqStatus.slice(1)}</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            // Materias que dependen de esta
+            const dependents = Object.entries(subjects)
+                .filter(([_, subj]) => subj.prereq.includes(code))
+                .map(([depCode, depSubj]) => `${depCode} - ${depSubj.name}`);
+
+            let dependentsHTML = '';
+            if (dependents.length > 0) {
+                dependentsHTML = `
+                    <div class="prereq-list">
+                        <h4><i class="fas fa-project-diagram"></i> Materias que dependen de esta:</h4>
+                        ${dependents.map(dep => `<div class="prereq-item"><span>${dep}</span></div>`).join('')}
+                    </div>
+                `;
+            }
+
+            document.getElementById('modal-body').innerHTML = `
+                <p><strong><i class="fas fa-layer-group"></i> Nivel:</strong> ${subject.level}</p>
+                <p><strong><i class="fas fa-clock"></i> Carga horaria:</strong> ${subject.hours}</p>
+                <p><strong><i class="fas fa-tag"></i> Categoría:</strong> ${getCategoryName(subject.category)}</p>
+                <p><strong><i class="fas fa-info-circle"></i> Estado actual:</strong> ${getStatusIcon(status)} ${status.charAt(0).toUpperCase() + status.slice(1)}</p>
+                ${subject.critical ? '<p><strong><i class="fas fa-star"></i> Materia crítica:</strong> Alta prioridad para el progreso</p>' : ''}
+                ${prereqHTML}
+                ${dependentsHTML}
+                <div class="status-buttons">
+                    <button class="btn btn-success" onclick="setSubjectStatus('${code}', 'aprobada')"><i class="fas fa-check"></i> Marcar como Aprobada</button>
+                    <button class="btn btn-warning" onclick="setSubjectStatus('${code}', 'cursando')"><i class="fas fa-book"></i> Marcar como Cursando</button>
+                    <button class="btn btn-danger" onclick="setSubjectStatus('${code}', 'reset')"><i class="fas fa-undo"></i> Resetear</button>
+                </div>
+            `;
+            
+            document.getElementById('subjectModal').style.display = 'block';
+        }
+
+        // Establecer estado específico de materia
+        function setSubjectStatus(code, status) {
+            studentProgress.aprobadas.delete(code);
+            studentProgress.cursando.delete(code);
+            
+            if (status === 'aprobada') {
+                studentProgress.aprobadas.add(code);
+            } else if (status === 'cursando') {
+                studentProgress.cursando.add(code);
+            }
+            
+            renderFlowchart();
+            updateStats();
+            updateRecommendations();
+            saveProgress();
+            closeModal();
+        }
+
+        // Cerrar modal
+        function closeModal() {
+            document.getElementById('subjectModal').style.display = 'none';
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const total = Object.keys(subjects).length;
+            const aprobadas = studentProgress.aprobadas.size;
+            const cursando = studentProgress.cursando.size;
+            
+            // Contar materias disponibles y bloqueadas
+            let disponibles = 0;
+            let bloqueadas = 0;
+            
+            Object.keys(subjects).forEach(code => {
+                if (!studentProgress.aprobadas.has(code) && !studentProgress.cursando.has(code)) {
+                    if (canTakeSubject(code)) {
+                        disponibles++;
+                    } else {
+                        bloqueadas++;
+                    }
+                }
+            });
+            
+            // Actualizar DOM
+            document.getElementById('stat-aprobadas').textContent = aprobadas;
+            document.getElementById('stat-disponibles').textContent = disponibles;
+            document.getElementById('stat-cursando').textContent = cursando;
+            document.getElementById('stat-bloqueadas').textContent = bloqueadas;
+            document.getElementById('stat-total').textContent = total;
+            
+            // Actualizar barra de progreso
+            const progress = Math.round((aprobadas / total) * 100);
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            document.getElementById('progress-text').textContent = `Progreso: ${progress}%`;
+        }
+
+        // Actualizar recomendaciones
+        function updateRecommendations() {
+            const list = document.getElementById('recommendation-list');
+            list.innerHTML = '';
+            
+            // Obtener materias críticas disponibles
+            const criticasDisponibles = [];
+            const noCriticasDisponibles = [];
+            
+            Object.entries(subjects).forEach(([code, subject]) => {
+                if (!studentProgress.aprobadas.has(code) && 
+                    !studentProgress.cursando.has(code) &&
+                    canTakeSubject(code)) {
+                    if (subject.critical) {
+                        criticasDisponibles.push(subject);
+                    } else {
+                        noCriticasDisponibles.push(subject);
+                    }
+                }
+            });
+            
+            if (criticasDisponibles.length === 0 && noCriticasDisponibles.length === 0) {
+                list.innerHTML = '<li>¡Felicidades! No hay materias disponibles para recomendar. Has completado todas las materias disponibles o no hay materias que puedas cursar en este momento.</li>';
+                return;
+            }
+            
+            // Mostrar primero las críticas
+            if (criticasDisponibles.length > 0) {
+                const li = document.createElement('li');
+                li.innerHTML = '<strong>Materias críticas disponibles:</strong>';
+                list.appendChild(li);
+                
+                criticasDisponibles.forEach(subject => {
+                    const li = document.createElement('li');
+                    li.textContent = `${subject.code} - ${subject.name} (${subject.hours})`;
+                    list.appendChild(li);
+                });
+            }
+            
+            // Luego las no críticas
+            if (noCriticasDisponibles.length > 0) {
+                const li = document.createElement('li');
+                li.innerHTML = '<strong>Otras materias disponibles:</strong>';
+                list.appendChild(li);
+                
+                noCriticasDisponibles.forEach(subject => {
+                    const li = document.createElement('li');
+                    li.textContent = `${subject.code} - ${subject.name} (${subject.hours})`;
+                    list.appendChild(li);
+                });
+            }
+        }
+
+        // Mostrar recomendaciones
+        function showRecommendations() {
+            updateRecommendations();
+            document.getElementById('recommendations').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Guardar progreso en localStorage
+        function saveProgress() {
+            const progress = {
+                aprobadas: Array.from(studentProgress.aprobadas),
+                cursando: Array.from(studentProgress.cursando)
+            };
+            localStorage.setItem('academicProgress', JSON.stringify(progress));
+        }
+
+        // Cargar progreso desde localStorage
+        function loadProgress() {
+            const savedProgress = localStorage.getItem('academicProgress');
+            if (savedProgress) {
+                const progress = JSON.parse(savedProgress);
+                studentProgress.aprobadas = new Set(progress.aprobadas);
+                studentProgress.cursando = new Set(progress.cursando);
+            }
+        }
+
+        // Exportar progreso
+        function exportProgress() {
+            const progress = {
+                aprobadas: Array.from(studentProgress.aprobadas),
+                cursando: Array.from(studentProgress.cursando)
+            };
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(progress, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "progreso_estudios.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        // Importar progreso
+        function importProgress() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const progress = JSON.parse(event.target.result);
+                        studentProgress.aprobadas = new Set(progress.aprobadas);
+                        studentProgress.cursando = new Set(progress.cursando);
+                        renderFlowchart();
+                        updateStats();
+                        updateRecommendations();
+                        saveProgress();
+                        alert('Progreso cargado con éxito');
+                    } catch (error) {
+                        alert('Error al cargar el archivo: ' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Reiniciar progreso
+        function resetProgress() {
+            if (confirm('¿Estás seguro de que deseas reiniciar todo tu progreso? Esta acción no se puede deshacer.')) {
+                studentProgress.aprobadas = new Set();
+                studentProgress.cursando = new Set();
+                saveProgress();
+                renderFlowchart();
+                updateStats();
+                updateRecommendations();
+            }
+        }
+
+        // Inicializar la aplicación cuando el DOM esté cargado
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Cerrar modal si se hace clic fuera de él
+        window.onclick = function(event) {
+            const modal = document.getElementById('subjectModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
+</body>
+</html>
